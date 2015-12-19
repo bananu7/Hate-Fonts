@@ -19,6 +19,6 @@ library
   exposed-modules:     Hate.Fonts
   -- other-modules:       
   -- other-extensions:    
-  build-depends:       base >=4.8 && <4.9, Hate, containers
+  build-depends:       base >=4.8 && <4.9, Hate >= 0.1.4.1, containers
   hs-source-dirs:      src
   default-language:    Haskell2010
