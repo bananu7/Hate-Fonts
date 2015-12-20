@@ -1,32 +1,40 @@
-module Hate.Fonts where
+module Hate.Fonts
+    ( module Hate.Fonts.Types
+    , hatePrint
+    )
+where
 
 import qualified Hate.Graphics as Hate
 import Hate.Math (Vec2(..))
 import qualified Data.Map as Map
 import Data.Maybe
+import Debug.Trace
 
 import Hate.Fonts.Types
 
-toRegion :: Font -> Char -> Maybe CharacterRegion
-toRegion f c = Map.lookup c f
+toCharData :: Font -> Char -> Maybe CharData
+toCharData f c = Map.lookup c f
+
+-- | A pair of x-offset, region to sample
+type HateText = [(Float, CharData)]
 
 toText :: Font -> String -> HateText
 toText f str = zip offsets regions
     where
-        regions = catMaybes . map (toRegion f) $ str
+        regions = catMaybes . map (toCharData f) $ str
 
         offsets = scanl calcOffset 0 regions
 
-        -- we calculate width of each character and add it to the accumulator
-        calcOffset :: Float -> CharacterRegion -> Float
-        calcOffset off (CharacterRegion (Vec2 x1 _) (Vec2 x2 _)) = off + (x2 - x1)
+        -- we use the xoffset data of each character to advance the offset
+        calcOffset :: Float -> CharData -> Float
+        calcOffset off (CharData _ _ xoff) = off + xoff
 
 renderText :: Hate.Sprite -> HateText -> [Hate.DrawRequest]
 renderText s txt = map toDR txt
     where
-        toDR :: (Float, CharacterRegion) -> Hate.DrawRequest
-        toDR (off, (CharacterRegion a b)) = 
-            Hate.translate (Vec2 off 0) $ Hate.spritePart (a, b) s
+        toDR :: (Float, CharData) -> Hate.DrawRequest
+        toDR (textOffset, CharData (CharacterRegion a b) (Vec2 ox oy) xadv) = 
+            Hate.translate (Vec2 (ox+textOffset) oy) $ (Hate.spritePart (a, b) s)
 
-print :: Font -> Hate.Sprite -> String -> [Hate.DrawRequest]
-print f spr = renderText spr . toText f
+hatePrint :: Font -> Hate.Sprite -> String -> [Hate.DrawRequest]
+hatePrint f spr = renderText spr . toText f

@@ -3,9 +3,12 @@ module Hate.Fonts.Types where
 import qualified Data.Map as Map
 import Hate.Math (Vec2(..))
 
-data CharacterRegion = CharacterRegion Vec2 Vec2
+data CharacterRegion = CharacterRegion Vec2 Vec2 deriving (Show, Eq)
 
-type Font = Map.Map Char CharacterRegion
+data CharData = CharData {
+    region :: CharacterRegion,
+    offset :: Vec2,
+    xadvance :: Float
+} deriving (Show, Eq)
 
--- | A pair of x-offset, region to sample
-type HateText = [(Float, CharacterRegion)]
+type Font = Map.Map Char CharData

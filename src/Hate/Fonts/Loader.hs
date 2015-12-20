@@ -1,8 +1,12 @@
 module Hate.Fonts.Loader where
 
+import Hate.Math
 import Hate.Fonts.Types
 import Text.XML.Light
 import Data.Maybe
+import qualified Data.Map as Map
+import Data.Char (chr)
+import Debug.Trace
 
 type Path = String
 
@@ -15,15 +19,30 @@ data BMHeader = BMHeader {
     } deriving (Show, Eq)
 
 data BMCharData = BMCharData {
-    id :: Int,
+    charId :: Int,
     x :: Int,
     y :: Int,
     width :: Int,
     height :: Int,
     xoffset :: Int,
     yoffset :: Int,
-    xadvance :: Int
+    xadv :: Int
     } deriving (Show, Eq)
+
+toFont :: BMFont -> Font
+toFont (BMFont header cs) = Map.fromList . map toCharData $ cs
+    where
+        toCharData (BMCharData c x y w h ox oy xa) = (chr c, CharData { 
+            region = CharacterRegion (Vec2 fx fy) (Vec2 fw fh),
+            offset = Vec2 (fi ox) (fi oy),
+            xadvance = fi xa
+            })
+          where
+            fi = fromIntegral
+            fx = fi x / fi (scaleW header)
+            fy = fi y / fi (scaleH header)
+            fw = fi (x+w) / fi (scaleW header)
+            fh = fi (y+h) / fi (scaleH header)
 
 
 xcharToChar :: Element -> Maybe BMCharData
@@ -60,12 +79,15 @@ font root = fontData
 
         fontData = BMFont (header root) (charData)
 
-loadFont :: Path -> IO BMFont
-loadFont p = do
+loadBMFont :: Path -> IO BMFont
+loadBMFont p = do
     fileData <- readFile p
     let contents = parseXML fileData
     let root = (head . tail $ onlyElems contents)
     return $ font root
+
+loadFont :: Path -> IO Font
+loadFont p = toFont <$> loadBMFont p
 
 
 
