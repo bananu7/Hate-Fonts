@@ -5,12 +5,7 @@ import Hate.Math (Vec2(..))
 import qualified Data.Map as Map
 import Data.Maybe
 
-data CharacterRegion = CharacterRegion Vec2 Vec2
-
-type Font = Map.Map Char CharacterRegion
-
--- | A pair of x-offset, region to sample
-type HateText = [(Float, CharacterRegion)]
+import Hate.Fonts.Types
 
 toRegion :: Font -> Char -> Maybe CharacterRegion
 toRegion f c = Map.lookup c f
