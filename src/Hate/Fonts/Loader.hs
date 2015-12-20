@@ -64,7 +64,7 @@ loadFont :: Path -> IO BMFont
 loadFont p = do
     fileData <- readFile p
     let contents = parseXML fileData
-    let root = (head $ onlyElems contents)
+    let root = (head . tail $ onlyElems contents)
     return $ font root
 
 
