@@ -8,15 +8,15 @@ import Debug.Trace
 
 data SampleState = SampleState {
     fontSprite :: Sprite,
-    fontData :: Font
+    fontData :: FontData
 }
 
 sampleLoad :: LoadFn SampleState
 sampleLoad = SampleState <$> loadSprite "Arial_0.png"
-                         <*> loadFont "Arial.fnt"
+                         <*> loadFontData "Arial.fnt"
 
 sampleDraw :: DrawFn SampleState
-sampleDraw s = hatePrint (fontData s) (fontSprite s) "Haters gonna Hate" 
+sampleDraw s = hatePrint (fontData s, fontSprite s) "Haters gonna Hate" 
 
 sampleUpdate :: UpdateFn SampleState
 sampleUpdate _ = return ()

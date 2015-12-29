@@ -29,8 +29,8 @@ data BMCharData = BMCharData {
     xadv :: Int
     } deriving (Show, Eq)
 
-toFont :: BMFont -> Font
-toFont (BMFont header cs) = Map.fromList . map toCharData $ cs
+toFontData :: BMFont -> FontData
+toFontData (BMFont header cs) = Map.fromList . map toCharData $ cs
     where
         toCharData (BMCharData c x y w h ox oy xa) = (chr c, CharData { 
             region = CharacterRegion (Vec2 fx fy) (Vec2 fw fh),
@@ -86,8 +86,8 @@ loadBMFont p = do
     let root = (head . tail $ onlyElems contents)
     return $ font root
 
-loadFont :: Path -> IO Font
-loadFont p = toFont <$> loadBMFont p
+loadFontData :: Path -> IO FontData
+loadFontData p = toFontData <$> loadBMFont p
 
 
 

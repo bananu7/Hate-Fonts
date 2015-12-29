@@ -12,13 +12,13 @@ import Debug.Trace
 
 import Hate.Fonts.Types
 
-toCharData :: Font -> Char -> Maybe CharData
+toCharData :: FontData -> Char -> Maybe CharData
 toCharData f c = Map.lookup c f
 
 -- | A pair of x-offset, region to sample
 type HateText = [(Float, CharData)]
 
-toText :: Font -> String -> HateText
+toText :: FontData -> String -> HateText
 toText f str = zip offsets regions
     where
         regions = catMaybes . map (toCharData f) $ str
@@ -36,5 +36,5 @@ renderText s txt = map toDR txt
         toDR (textOffset, CharData (CharacterRegion a b) (Vec2 ox oy) xadv) = 
             Hate.translate (Vec2 (ox+textOffset) oy) $ (Hate.spritePart (a, b) s)
 
-hatePrint :: Font -> Hate.Sprite -> String -> [Hate.DrawRequest]
-hatePrint f spr = renderText spr . toText f
+hatePrint :: Font -> String -> [Hate.DrawRequest]
+hatePrint (f, spr) = renderText spr . toText f
